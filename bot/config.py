@@ -57,6 +57,7 @@ class Settings:
     bunker_channel_name: str
     reveal_duration: int
     voting_duration: int
+    storage_path: Path
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -79,4 +80,5 @@ class Settings:
             bunker_channel_name=_get_str("BUNKER_CHANNEL_NAME", "🎮bunker-game"),
             reveal_duration=_get_positive_int("REVEAL_DURATION", 30),
             voting_duration=_get_positive_int("VOTING_DURATION", 30),
+            storage_path=Path(_get_str("STORAGE_PATH") or PROJECT_DIR / "storage" / "guilds.json"),
         )

@@ -7,6 +7,7 @@ import disnake
 from disnake.ext import commands
 
 from bot.config import Settings
+from bot.storage import GuildConfig, GuildConfigStore
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,13 @@ class VoidBot(commands.Bot):
             test_guilds=settings.test_guilds,
         )
         self.settings = settings
+        self.guild_config = GuildConfigStore(
+            settings.storage_path,
+            defaults=GuildConfig(
+                welcome_channel_id=settings.welcome_channel_id,
+                autorole_id=settings.autorole_id,
+            ),
+        )
 
     def load_all_extensions(self) -> None:
         from bot import cogs
