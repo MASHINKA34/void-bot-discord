@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Эмбед 1",
+    "description": "Описание эмбеда 1",
+    "color": "#3498DB",
+    "image": "kiev.png"
+  },
+  {
+    "title": "Эмбед 2",
+    "description": "Описание эмбеда 2",
+    "color": "#E74C3C",
+    "image": "kiev.png"
+  },
+  {
+    "title": "Эмбед 3",
+    "description": "Описание эмбеда 3",
+    "color": "#2ECC71",
+    "image": "kiev.png"
+  }
+]
