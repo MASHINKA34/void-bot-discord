@@ -31,12 +31,39 @@ class GuildConfigStore:
     def is_configured(self, guild_id: int) -> bool:
         return guild_id in self._cache
 
+    def __len__(self) -> int:
+        return len(self._cache)
+
+    @property
+    def path(self) -> Path:
+        return self._path
+
+    def dumps(self) -> str:
+        return json.dumps(self._as_payload(), ensure_ascii=False, indent=2)
+
     async def update(self, guild_id: int, **changes: Any) -> GuildConfig:
         async with self._lock:
             config = replace(self.get(guild_id), **changes)
             self._cache[guild_id] = config
             await asyncio.to_thread(self._write)
             return config
+
+    async def load_dump(self, text: str) -> int:
+        raw = json.loads(text)
+        if not isinstance(raw, dict):
+            raise ValueError("Ожидается JSON-объект вида {\"id сервера\": {...}}")
+
+        parsed = self._parse(raw)
+        if not parsed:
+            raise ValueError("В файле нет ни одной корректной записи")
+
+        async with self._lock:
+            self._cache = parsed
+            await asyncio.to_thread(self._write)
+        return len(parsed)
+
+    def _as_payload(self) -> dict[str, dict[str, Any]]:
+        return {str(gid): asdict(cfg) for gid, cfg in self._cache.items()}
 
     def _read(self) -> dict[int, GuildConfig]:
         if not self._path.is_file():
@@ -46,7 +73,13 @@ class GuildConfigStore:
         except (OSError, json.JSONDecodeError):
             logger.exception("Не удалось прочитать %s, настройки серверов сброшены", self._path)
             return {}
+        if not isinstance(raw, dict):
+            logger.error("Неверный формат %s, настройки серверов сброшены", self._path)
+            return {}
+        return self._parse(raw)
 
+    @staticmethod
+    def _parse(raw: dict[str, Any]) -> dict[int, GuildConfig]:
         result: dict[int, GuildConfig] = {}
         for key, value in raw.items():
             if not isinstance(value, dict):
@@ -62,11 +95,10 @@ class GuildConfigStore:
 
     def _write(self) -> None:
         self._path.parent.mkdir(parents=True, exist_ok=True)
-        payload = {str(gid): asdict(cfg) for gid, cfg in self._cache.items()}
         fd, tmp_name = tempfile.mkstemp(dir=self._path.parent, suffix=".tmp")
         try:
             with os.fdopen(fd, "w", encoding="utf-8") as handle:
-                json.dump(payload, handle, ensure_ascii=False, indent=2)
+                json.dump(self._as_payload(), handle, ensure_ascii=False, indent=2)
             os.replace(tmp_name, self._path)
         except BaseException:
             Path(tmp_name).unlink(missing_ok=True)
