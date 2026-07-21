@@ -1,7 +1,7 @@
 # Void Bot
 
-Discord-бот на [disnake](https://docs.disnake.dev/): игра «Бункер», приветствие новичков,
-фильтр запрещённых слов и меню выдачи игровых ролей.
+Discord-бот на [disnake](https://docs.disnake.dev/): игра «Бункер», приветствие новичков
+и фильтр запрещённых слов.
 
 ## Запуск
 
@@ -27,7 +27,6 @@ bot/
     bunker.py               слэш-команды игры «Бункер»
     greetings.py            приветствие и автовыдача роли
     moderation.py           фильтр запрещённых слов
-    roles.py                меню выбора игровой позиции
     owner.py                load / unload / reload
   bunker/
     character.py            пул характеристик
@@ -38,7 +37,6 @@ bot/
   data/
     characters.json         характеристики
     scenarios.json          сценарии
-    lane_roles.json         роли для меню /games
     welcome_gifs.txt        гифки для приветствия
     banned_words.txt        запрещённые слова
 ```
@@ -54,5 +52,4 @@ bot/
 | --- | --- |
 | `bot/data/characters.json` | категории и варианты характеристик |
 | `bot/data/scenarios.json` | заголовок, описание, цвет и картинка сценария |
-| `bot/data/lane_roles.json` | ID ролей и эмодзи для меню `/games` |
 | `bot/data/banned_words.txt` | слова через пробел или с новой строки |
